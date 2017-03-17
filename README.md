@@ -1,8 +1,8 @@
-Random App Name17656
+Business Value Scoring
 =========================
 
 ## Overview
-
+Custom Calculation of Business Scores
 
 ## License
 
