@@ -1,0 +1,13 @@
+{
+   "name": "Random App Name17656",
+   "className": "CustomApp",
+   "server": "https://rally1.rallydev.com",
+   "sdk": "2.0",
+   "javascript": [
+      "App.js",
+      "utility.js"
+   ],
+   "css": [
+      "app.css"
+   ]
+}
