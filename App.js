@@ -96,7 +96,7 @@ Ext.define('CustomApp', {
         var key = _.has(mappings,field) ? field : 'default';
         // console.log("key",key)
         var mapping = mappings[key];
-        // console.log("mapping",value,"to",mapping[value]);
+        // console.log(field + ":mapping",value,"to",mapping[value]);
         return _.has(mapping,value) ? mapping[value] : 0;
     },
 
@@ -116,7 +116,7 @@ Ext.define('CustomApp', {
     },
 
     _calcValue : function(record,calcField) {
-        console.log("_calcValue");
+        // console.log("_calcValue");
 
         var that = this;
         var regex = /\w{2,50}/g ;
@@ -141,8 +141,9 @@ Ext.define('CustomApp', {
         var value;
 
         try {
-            console.log("formula",formula);
+            // console.log("formula",formula);
             value = eval(formula);
+            value = !_.isNumber(value) || _.isNaN(value) || !_.isFinite(value) ? 0 : value;
             console.log("formula:",formula,"value",value);
         } catch (e) {
             return {
@@ -161,6 +162,7 @@ Ext.define('CustomApp', {
     _onPICombobox: function() {
         var selectedType = this._piCombobox.getRecord();
         var model = selectedType.get('TypePath');
+        var that = this;
         
         if (this._grid !== null) {
             this._grid.destroy();
@@ -174,9 +176,12 @@ Ext.define('CustomApp', {
                 //     this._calculateScore(records);
                 // },
                 update: function(store, rec, modified, opts) {
-                    console.log(modified,opts);
-                    if (modified=="commit" && _.isNull(opts)) {
-                        console.log(rec,modified,opts);
+                    // console.log(modified,opts);
+                    // that.calculatedFields
+                    
+                    if (modified=="edit" && opts.length==1 
+                        && (!_.contains(_.pluck(that.calculatedFields,'field'),opts[0])))    {
+                        // console.log(rec,modified,opts);
                         this._calculateScore([rec]);
                     }
                 },
@@ -248,7 +253,7 @@ Ext.define('CustomApp', {
     },
     
     _calculateScore: function(records)  {
-        console.log("_calculateScore");
+        // console.log("_calculateScore");
         var that = this;
 
         Ext.Array.each(records, function(feature) {
@@ -257,7 +262,7 @@ Ext.define('CustomApp', {
                 var oldValue = feature.get(calcField.field);
                 var value = that._calcValue(feature,calcField);
                 if (_.isNull(value.error)) {
-                    if (value.value!==oldValue)
+                    if (!_.isNull(value.value) && value.value!==oldValue)
                         feature.set(calcField.field, value.value);
                 }
                 else
