@@ -5,6 +5,24 @@
 // var formula = "(c_SalesProfitability + c_CostSavings + c_CustomerExperience + c_AgentExperience + c_RiskMitigationCompliance + c_Urgency + c_RiskFactorOfNotDoing + c_Foundational)";
 // console.log(_getFormulaFields(formula));
 
+function _getDefaultColumns() {
+    return [
+        "c_SalesProfitability",
+        "c_CostSavings",
+        "c_CustomerExperience",
+        "c_AgentExperience",
+        "c_RiskMitigationCompliance",
+        "c_Urgency",
+        "c_RiskFactorOfNotDoing",
+        "c_Foundational",
+        "c_TShirtSizeBusiness",
+        "c_TShirtSizeIT",
+        "c_BusinessValueScore",
+        "c_CustomWSJFScore",
+        "c_CategoryEPICOnly"
+    ];
+}
+
 function  _getFormulaFields(formula) {
 
         var regex = /\w{2,50}/g;

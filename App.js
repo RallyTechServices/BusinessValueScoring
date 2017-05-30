@@ -177,7 +177,7 @@ Ext.define('CustomApp', {
         var selectedType = this._piCombobox.getRecord();
         var modelNames = selectedType.get('TypePath');
 
-        var columns = ['Name'];
+        var columns = ['Name'].concat(_getDefaultColumns());
         var context = this.getContext();
         
         this._grid = this.add({

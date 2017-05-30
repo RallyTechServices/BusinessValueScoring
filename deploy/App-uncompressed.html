@@ -186,7 +186,7 @@ Ext.define('CustomApp', {
         var selectedType = this._piCombobox.getRecord();
         var modelNames = selectedType.get('TypePath');
 
-        var columns = ['Name'];
+        var columns = ['Name'].concat(_getDefaultColumns());
         var context = this.getContext();
         
         this._grid = this.add({
@@ -344,6 +344,24 @@ Ext.define('CustomApp', {
 
 // var formula = "(c_SalesProfitability + c_CostSavings + c_CustomerExperience + c_AgentExperience + c_RiskMitigationCompliance + c_Urgency + c_RiskFactorOfNotDoing + c_Foundational)";
 // console.log(_getFormulaFields(formula));
+
+function _getDefaultColumns() {
+    return [
+        "c_SalesProfitability",
+        "c_CostSavings",
+        "c_CustomerExperience",
+        "c_AgentExperience",
+        "c_RiskMitigationCompliance",
+        "c_Urgency",
+        "c_RiskFactorOfNotDoing",
+        "c_Foundational",
+        "c_TShirtSizeBusiness",
+        "c_TShirtSizeIT",
+        "c_BusinessValueScore",
+        "c_CustomWSJFScore",
+        "c_CategoryEPICOnly"
+    ];
+}
 
 function  _getFormulaFields(formula) {
 
