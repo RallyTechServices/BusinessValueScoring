@@ -251,8 +251,10 @@ Ext.define('CustomApp', {
         var allSet = true;
         _.each(fields,function(field){
             var value = feature.get(field);
-            if (_.isNull(value)||_.isUndefined(value)||value=="")
+            if (_.isNull(value)||_.isUndefined(value)||value=="") {
+                console.log("Missing Field Value:'"+field+"'");
                 allSet = false;
+            }
         });
         return allSet;
     },
@@ -274,7 +276,7 @@ Ext.define('CustomApp', {
 
         // console.log("cat:",cat);
         if (cat)
-            feature.set("c_Category",cat);
+            feature.set("c_CategoryEpicOnly",cat);
 
     },
     
