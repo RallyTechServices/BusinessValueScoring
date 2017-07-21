@@ -2,6 +2,7 @@ var Ext = window.Ext4 || window.Ext;
 Ext.define('CustomApp', {
     extend: 'Rally.app.App',
     componentCls: 'app',
+
     launch: function() {
         var that = this;
 
@@ -255,6 +256,27 @@ Ext.define('CustomApp', {
         });
         return allSet;
     },
+
+    // Barry - set the category column based on the Business Value Score.
+    _setCategory : function(feature, bvs ) {
+        var cat = null;
+
+        if ( bvs >= 0 && bvs < 10 )
+            cat = "5"
+        else if ( bvs >= 10 && bvs < 20 )
+            cat = "4"
+        else if ( bvs >= 20 && bvs < 30 )
+            cat = "3"
+        else if ( bvs >= 30 && bvs < 50 )
+            cat = "2"
+        else if ( bvs >= 50 )
+            cat = "1"
+
+        // console.log("cat:",cat);
+        if (cat)
+            feature.set("c_Category",cat);
+
+    },
     
     _calculateScore: function(records)  {
         var that = this;
@@ -270,6 +292,10 @@ Ext.define('CustomApp', {
                     if (_.isNull(value.error)) {
                         if (!_.isNull(value.value) && value.value!==oldValue)
                             feature.set(calcField.field, value.value);
+                            // Barry - set the category field, when the Business Value Score
+                            // is updated.
+                            if (calcField.field=="c_BusinessValueScore")
+                                that._setCategory(feature,value.value);
                     }
                     else
                         console.log("formula error:",value.error)

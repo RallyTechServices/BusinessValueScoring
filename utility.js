@@ -19,7 +19,8 @@ function _getDefaultColumns() {
         "c_TShirtSizeIT",
         "c_BusinessValueScore",
         "c_CustomWSJFScore",
-        "c_CategoryEPICOnly"
+        "c_CategoryEpicOnly",
+        
     ];
 }
 
