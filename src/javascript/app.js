@@ -42,11 +42,10 @@ Ext.define("CArABU.app.TSApp", {
     _reCalculate:function(){
         console.log(this._grid);
         if(this._grid){
-            // var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
-            // this._calculateScore(records);
+            var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
+            this._calculateScore(records,true);
 
-
-            this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload();
+            //this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload();
             // var store = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store;
             // var records = store.getRootNode().childNodes;
             // this._calculateScore(records);
@@ -164,10 +163,10 @@ Ext.define("CArABU.app.TSApp", {
         Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
             models: [ model ],
             listeners: {
-                load: function(store) {
-                    var records = store.getRootNode().childNodes;
-                    this._calculateScore(records);
-                },
+                // load: function(store, node, records, successful, eOpts) {
+                //     //var records = store.getRootNode().childNodes;
+                //     this._calculateScore(records);
+                // },
                 update: function(store, rec, modified, opts) {
                     if (modified=="edit" && opts.length==1 
                         && (!_.contains(_.pluck(that.calculatedFields,'field'),opts[0])))    {
@@ -241,8 +240,7 @@ Ext.define("CArABU.app.TSApp", {
                         {
                             text: 'Export...',
                             handler: function() {
-                                window.location = Rally.ui.grid.GridCsvExport.buildCsvExportUrl(
-                                    this.down('rallygridboard').getGridOrBoard());
+                                window.location = Rally.ui.gridboard.Export.buildCsvExportUrl(this._grid.getGridOrBoard());
                             },
                             scope: this
                         }
@@ -311,7 +309,7 @@ Ext.define("CArABU.app.TSApp", {
 
     },
     
-    _calculateScore: function(records)  {
+    _calculateScore: function(records,save)  {
         var that = this;
 
         Ext.Array.each(records, function(feature) {
@@ -327,6 +325,7 @@ Ext.define("CArABU.app.TSApp", {
                             feature.set(calcField.field, value.value);
                             // Barry - set the category field, when the Business Value Score
                             // is updated.
+                            if(save)feature.save();
                             if (calcField.field=="c_BusinessValueScore")
                                 that._setCategory(feature,value.value);
                     }
