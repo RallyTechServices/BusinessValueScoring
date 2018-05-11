@@ -1,7 +1,13 @@
-var Ext = window.Ext4 || window.Ext;
-Ext.define('CustomApp', {
+Ext.define("CArABU.app.TSApp", {
     extend: 'Rally.app.App',
     componentCls: 'app',
+    logger: new CArABU.technicalservices.Logger(),
+    // defaults: { margin: 10 },
+    // layout: 'border',
+    items: [
+        {xtype:'container',flex: 1, itemId:'selector_box', layout:'hbox'},
+        {xtype:'container',flex: 1, itemId:'grid_box'},
+    ],
 
     launch: function() {
         var that = this;
@@ -12,7 +18,7 @@ Ext.define('CustomApp', {
         that.ValueMappings = JSON.parse(that.getSetting("ValueMappings"));
 
         this._grid = null;
-        this._piCombobox = this.add({
+        this._piCombobox = this.down('#selector_box').add({
             xtype: "rallyportfolioitemtypecombobox",
             padding: 5,
             listeners: {
@@ -20,6 +26,31 @@ Ext.define('CustomApp', {
                 scope: this
             }
         });
+
+        this.down('#selector_box').add({
+            xtype: "rallybutton",
+            text: "Recalculate",
+            padding: 5,
+            listeners: {
+                click: this._reCalculate,
+                scope: this
+            }
+        })
+    },
+
+
+    _reCalculate:function(){
+        console.log(this._grid);
+        if(this._grid){
+            // var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
+            // this._calculateScore(records);
+
+
+            this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload();
+            // var store = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store;
+            // var records = store.getRootNode().childNodes;
+            // this._calculateScore(records);
+        }
     },
 
     _getCalculatedFields : function() {
@@ -133,10 +164,10 @@ Ext.define('CustomApp', {
         Ext.create('Rally.data.wsapi.TreeStoreBuilder').build({
             models: [ model ],
             listeners: {
-                // load: function(store) {
-                //     var records = store.getRootNode().childNodes;
-                //     this._calculateScore(records);
-                // },
+                load: function(store) {
+                    var records = store.getRootNode().childNodes;
+                    this._calculateScore(records);
+                },
                 update: function(store, rec, modified, opts) {
                     if (modified=="edit" && opts.length==1 
                         && (!_.contains(_.pluck(that.calculatedFields,'field'),opts[0])))    {
@@ -181,7 +212,7 @@ Ext.define('CustomApp', {
         var columns = ['Name'].concat(_getDefaultColumns());
         var context = this.getContext();
         
-        this._grid = this.add({
+        this._grid = this.down('#grid_box').add({
             xtype: 'rallygridboard',
             context: context,
             modelNames: [ modelNames ],
@@ -351,8 +382,9 @@ Ext.define('CustomApp', {
         defaultSettings : {
             ValueMappings : _getValueMappingsString(),
             Weightings    : _getWeightingsString(),
-            CalculatedField1 : "",
-            CalculatedField2 : ""
+            CalculatedField1 : "c_BusinessValueScore,(c_SalesProfitability + c_CostSavings + c_CustomerExperience + c_AgentExperience + c_RiskMitigationCompliance + c_Urgency + c_RiskFactorOfNotDoing + c_Foundational)",
+            CalculatedField2 : "c_CustomWSJFScore,(c_BusinessValueScore / (c_TShirtSizeBusiness+c_TShirtSizeIT))"
         }
     }
+
 });
