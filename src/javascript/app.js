@@ -44,11 +44,11 @@ Ext.define("CArABU.app.TSApp", {
         if(this._grid){
             var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
             this._calculateScore(records,true);
+            Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
+            setTimeout(function() { 
+                Rally.ui.notify.Notifier.hide();
+            }, 4000);
 
-            //this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload();
-            // var store = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store;
-            // var records = store.getRootNode().childNodes;
-            // this._calculateScore(records);
         }
     },
 
@@ -310,6 +310,8 @@ Ext.define("CArABU.app.TSApp", {
     },
     
     _calculateScore: function(records,save)  {
+        this.setLoading(true);
+
         var that = this;
 
         Ext.Array.each(records, function(feature) {
@@ -325,7 +327,7 @@ Ext.define("CArABU.app.TSApp", {
                             feature.set(calcField.field, value.value);
                             // Barry - set the category field, when the Business Value Score
                             // is updated.
-                            if(save)feature.save();
+
                             if (calcField.field=="c_BusinessValueScore")
                                 that._setCategory(feature,value.value);
                     }
@@ -336,8 +338,9 @@ Ext.define("CArABU.app.TSApp", {
                     feature.set(calcField.field, 0);
                 }
             })
+            if(save)feature.save();            
         })
-
+        this.setLoading(false);
     },
     
     getSettingsFields : function() {
