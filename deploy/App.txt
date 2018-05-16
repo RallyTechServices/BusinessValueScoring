@@ -3,13 +3,13 @@
 <head>
     <title>CATS-Business Value Scoring App-0.1</title>
     <!--  (c) 2017 CA Technologies.  All Rights Reserved. -->
-    <!--  Build Date: Mon May 14 2018 14:17:53 GMT-0700 (PDT) -->
+    <!--  Build Date: Wed May 16 2018 15:40:05 GMT-0700 (PDT) -->
 
     <script type="text/javascript">
-        var APP_BUILD_DATE = "Mon May 14 2018 14:17:53 GMT-0700 (PDT)";
+        var APP_BUILD_DATE = "Wed May 16 2018 15:40:05 GMT-0700 (PDT)";
         var ARTIFACT = "US2503";
         var BUILDER  = "rajan08";
-        var CHECKSUM = 10975475006;
+        var CHECKSUM = 11148180857;
     </script>
 
     <script type="text/javascript" src="/apps/2.1/sdk.js"></script>
@@ -456,24 +456,29 @@ Ext.define("CArABU.app.TSApp", {
             text: "Recalculate",
             padding: 5,
             listeners: {
-                click: this._reCalculate,
+                click: this._recalculate,
                 scope: this
             }
         })
     },
 
 
-    _reCalculate:function(){
+    _recalculate:function(){
         console.log(this._grid);
-        if(this._grid){
-            var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
-            this._calculateScore(records,true);
-            Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
-            setTimeout(function() { 
-                Rally.ui.notify.Notifier.hide();
-            }, 4000);
-
-        }
+        this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload({
+            callback: function(){
+                if(this._grid){
+                    var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
+                    this._calculateScore(records,true);
+                    this._onPICombobox();
+                    Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
+                    setTimeout(function() { 
+                        Rally.ui.notify.Notifier.hide();
+                    }, 4000);
+                }
+            },
+            scope:this
+        });
     },
 
     _getCalculatedFields : function() {
@@ -588,8 +593,7 @@ Ext.define("CArABU.app.TSApp", {
             models: [ model ],
             listeners: {
                 // load: function(store, node, records, successful, eOpts) {
-                //     //var records = store.getRootNode().childNodes;
-                //     this._calculateScore(records);
+                //     this._calculateScore(records,true);
                 // },
                 update: function(store, rec, modified, opts) {
                     if (modified=="edit" && opts.length==1 
