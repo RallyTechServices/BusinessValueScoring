@@ -32,24 +32,29 @@ Ext.define("CArABU.app.TSApp", {
             text: "Recalculate",
             padding: 5,
             listeners: {
-                click: this._reCalculate,
+                click: this._recalculate,
                 scope: this
             }
         })
     },
 
 
-    _reCalculate:function(){
+    _recalculate:function(){
         console.log(this._grid);
-        if(this._grid){
-            var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
-            this._calculateScore(records,true);
-            Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
-            setTimeout(function() { 
-                Rally.ui.notify.Notifier.hide();
-            }, 4000);
-
-        }
+        this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload({
+            callback: function(){
+                if(this._grid){
+                    var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
+                    this._calculateScore(records,true);
+                    this._onPICombobox();
+                    Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
+                    setTimeout(function() { 
+                        Rally.ui.notify.Notifier.hide();
+                    }, 4000);
+                }
+            },
+            scope:this
+        });
     },
 
     _getCalculatedFields : function() {
@@ -164,8 +169,7 @@ Ext.define("CArABU.app.TSApp", {
             models: [ model ],
             listeners: {
                 // load: function(store, node, records, successful, eOpts) {
-                //     //var records = store.getRootNode().childNodes;
-                //     this._calculateScore(records);
+                //     this._calculateScore(records,true);
                 // },
                 update: function(store, rec, modified, opts) {
                     if (modified=="edit" && opts.length==1 
