@@ -20,7 +20,6 @@ function _getDefaultColumns() {
         "c_BusinessValueScore",
         "c_CustomWSJFScore",
         "c_CategoryEpicOnly",
-        
     ];
 }
 
