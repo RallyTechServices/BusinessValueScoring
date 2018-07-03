@@ -39,23 +39,56 @@ Ext.define("CArABU.app.TSApp", {
     },
 
 
+
     _recalculate:function(){
-        console.log(this._grid);
-        this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload({
-            callback: function(){
-                if(this._grid){
-                    var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
-                    this._calculateScore(records,true);
-                    this._onPICombobox();
-                    Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
-                    setTimeout(function() { 
-                        Rally.ui.notify.Notifier.hide();
-                    }, 4000);
-                }
+        var me = this;
+        var selectedType = this._piCombobox.getRecord();
+        var model = selectedType.get('TypePath');
+
+        var config = {
+            model:  model,
+            fetch: ['Name'].concat(_getDefaultColumns()),
+            limit: Infinity
+        };
+
+        me.setLoading(true);
+
+        me.loadWsapiRecords(config).then({
+            success: function(records){
+                me._calculateScore(records,true);
+                me._onPICombobox();
+                Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
+                me.setLoading(false);
+                setTimeout(function() { 
+                    Rally.ui.notify.Notifier.hide();
+                }, 3000);   
             },
-            scope:this
+            failure: function(msg) {
+                me.setLoading(false);
+                deferred.reject(msg);
+             
+            },
+            scope: me
         });
     },
+
+    // _recalculate:function(){
+    //     console.log(this._grid);
+    //     this._grid.getGridOrBoard() && this._grid.getGridOrBoard().store && this._grid.getGridOrBoard().store.reload({
+    //         callback: function(){
+    //             if(this._grid){
+    //                 var records = this._grid.getGridOrBoard() && this._grid.getGridOrBoard().getRootNode() && this._grid.getGridOrBoard().getRootNode().childNodes || [];
+    //                 this._calculateScore(records,true);
+    //                 this._onPICombobox();
+    //                 Rally.ui.notify.Notifier.show({message: 'Recalculated!'});
+    //                 setTimeout(function() { 
+    //                     Rally.ui.notify.Notifier.hide();
+    //                 }, 4000);
+    //             }
+    //         },
+    //         scope:this
+    //     });
+    // },
 
     _getCalculatedFields : function() {
 
@@ -346,7 +379,31 @@ Ext.define("CArABU.app.TSApp", {
         })
         this.setLoading(false);
     },
-    
+
+    loadWsapiRecords: function(config,returnOperation){
+        var deferred = Ext.create('Deft.Deferred');
+        var me = this;
+                
+        var default_config = {
+            model: 'Defect',
+            fetch: ['ObjectID']
+        };
+        Ext.create('Rally.data.wsapi.Store', Ext.Object.merge(default_config,config)).load({
+            callback : function(records, operation, successful) {
+                if (successful){
+                    if ( returnOperation ) {
+                        deferred.resolve(operation);
+                    } else {
+                        deferred.resolve(records);
+                    }
+                } else {
+                    deferred.reject('Problem loading: ' + operation.error.errors.join('. '));
+                }
+            }
+        });
+        return deferred.promise;
+    },
+
     getSettingsFields : function() {
         var values = [
             {
